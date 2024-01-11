@@ -1,0 +1,49 @@
+version : '3'
+
+services:
+  dramatiq-worker:
+    build:
+      context: .
+    command: ["dramatiq", "basic", "--processes", "16"]
+    depends_on: 
+      - redis
+    networks:
+      - dramatiq-network
+
+
+  redis:
+    image: "redis:alpine"
+    environment:
+      - env_var_name="redis://redis:6379/0"
+    ports: [6379]
+      
+    networks:
+      - dramatiq-network
+
+  rabbitmq:
+    image: "rabbitmq:management"
+    ports:
+  
+     #- "5672:5672"
+     - "15672:15672"
+
+
+  fastapi:
+    build:
+      context: .
+    command: ["uvicorn", "basic:app", "--host", "0.0.0.0", "--port", "8000"]
+    depends_on:
+      - dramatiq-worker
+    ports:
+
+      - "8000:8000"
+    networks:
+      - dramatiq-network
+
+networks:
+  dramatiq-network:
+      driver: bridge
+       
+
+      
+    

@@ -1,0 +1,5 @@
+dramatiq
+fastapi
+uvicorn
+redis
+rabbitmq
