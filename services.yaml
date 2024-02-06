@@ -1,0 +1,54 @@
+---
+#redis
+apiVersion: v1
+kind: Service
+metadata: 
+  name: redis-service
+spec:
+  selector:
+    app: redis
+  ports:
+  - protocol: TCP
+    port: 6379
+    targetPort: 6379
+---
+
+#mongodb
+apiVersion: v1
+kind: Service
+metadata: 
+  name: mongodb-service
+spec:
+  selector:
+    app: mongodb
+  ports:
+  - protocol: TCP
+    port: 12707
+    targetPort: 12707
+---
+
+
+#fastapi
+apiVersion: v1
+kind: Service
+metadata: 
+  name: fastapi-service
+spec:
+  selector:
+    app: fastapi
+  ports:
+  - protocol: TCP
+    port: 8000
+    targetPort: 8000
+  type: NodePort
+
+
+
+
+
+
+
+
+
+
+

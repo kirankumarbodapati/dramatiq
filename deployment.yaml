@@ -1,0 +1,116 @@
+---
+#redis
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+   name: redis-deployment
+spec:
+   replicas: 1
+   selector: 
+     matchLabels:
+       app: redis
+   template:
+     metadata:
+       labels:
+         app: redis
+     spec:
+       containers: 
+       - name: redis-container
+         image: redis:latest
+         ports:
+         - containerPort: 6379
+---
+
+
+#mongodb
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+   name: mongodb-deployment
+spec:
+   replicas: 1
+   selector: 
+     matchLabels:
+       app: mongodb
+   template:
+     metadata:
+       labels:
+         app: mongodb
+     spec:
+       containers: 
+       - name: mongodb-container
+         image: mongo:latest
+         ports:
+         - containerPort: 27017
+         env:
+         - name: MONGO_INIT_DATABASE
+           value: "mongodb_database"
+---
+
+
+#dramatiq-worker
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+   name: dramatiq-worker-deployment
+spec:
+   replicas: 1
+   selector: 
+     matchLabels:
+       app: dramatiq-worker
+   template:
+     metadata:
+       labels:
+         app: dramatiq-worker
+     spec:
+       containers: 
+       - name: dramatiq-worker-container
+         image: kiran1-dramatiq-worker:latest
+         #command: [ "sleep" ]
+        #  args: [ "infinity" ]
+        #  command: ["/bin/sh"]
+         args: ["-c", "while true; do echo hello; sleep 10;done"]
+         env:
+         - name: REDIS_URL
+           value: "redis://redis:6379"
+         - name: MONGODB_URL
+           value: "mongodb://mongodb-service:27017"
+         command: ["dramatiq", "api_module:broker", "--processes", "16"]
+---
+
+#fastapi
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+   name: fastapi-deployment
+spec:
+   replicas: 1
+   selector: 
+     matchLabels:
+       app: fastapi
+   template:
+     metadata:
+       labels:
+         app: fastapi
+     spec:
+       containers: 
+       - name: fastapi-container
+         image: kiran1-fastapi:latest
+        #  command: [ "sleep" ]
+        #  args: [ "infinity" ]
+        #  command: ["/bin/sh"]
+        #  args: ["-c", "while true; do echo hello; sleep 10;done"]
+         ports:
+         - containerPort: 8000
+         command: ["uvicorn", "api_module:app", "--host", "0.0.0.0", "--port", "8000"]
+
+       
+---
+
+        
+        
+        
+
+
+
+
